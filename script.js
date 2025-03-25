@@ -7,6 +7,7 @@ window.initMap = function() {
         const mapElement = document.getElementById('map');
         if (!mapElement) {
             console.error('Map element not found');
+            showMapError('Map element not found. Please refresh the page.');
             return;
         }
         
@@ -59,7 +60,8 @@ window.initMap = function() {
             );
             
             // Prevent form submission on enter in autocomplete
-            google.maps.event.addDomListener(document.getElementById('pickup'), 'keydown', function(e) {
+            // Using standard addEventListener instead of deprecated addDomListener
+            document.getElementById('pickup').addEventListener('keydown', function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
                 }
@@ -86,7 +88,8 @@ window.initMap = function() {
             );
             
             // Prevent form submission on enter in autocomplete
-            google.maps.event.addDomListener(document.getElementById('destination'), 'keydown', function(e) {
+            // Using standard addEventListener instead of deprecated addDomListener
+            document.getElementById('destination').addEventListener('keydown', function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
                 }
@@ -155,6 +158,8 @@ function showMapError(message) {
 
 // DOM Elements
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded, setting up event listeners");
+    
     const rideForm = document.getElementById('ride-form');
     const bookingModal = document.getElementById('booking-modal');
     const bookingDetails = document.getElementById('booking-details');
@@ -315,18 +320,61 @@ function placeMarker(location, type = window.selectedMode) {
         return true;
     });
     
-    // Create a new marker
-    const marker = new google.maps.Marker({
-        position: position,
-        map: window.map,
-        animation: google.maps.Animation.DROP,
-        icon: type === 'pickup' ? 
-            'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
-            'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
-    });
+    // Create a new marker using the recommended AdvancedMarkerElement class if available
+    let marker;
     
-    // Add the type property to the marker
-    marker.type = type;
+    try {
+        // Check if the advanced marker API is available
+        if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+            // Use the new AdvancedMarkerElement (recommended)
+            const markerView = new google.maps.marker.AdvancedMarkerElement({
+                map: window.map,
+                position: position,
+                title: type === 'pickup' ? 'Pickup Location' : 'Destination',
+                content: buildAdvancedMarkerContent(type)
+            });
+            
+            // Add custom properties 
+            markerView.type = type;
+            markerView.setMap = function(map) {
+                if (map === null) {
+                    this.map = null;
+                } else {
+                    this.map = map;
+                }
+            };
+            
+            marker = markerView;
+        } else {
+            // Fallback to standard Marker if AdvancedMarkerElement is not available
+            marker = new google.maps.Marker({
+                position: position,
+                map: window.map,
+                animation: google.maps.Animation.DROP,
+                icon: type === 'pickup' ? 
+                    'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                    'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+            });
+            
+            // Add the type property to the marker
+            marker.type = type;
+        }
+    } catch (error) {
+        console.warn('Error creating advanced marker, falling back to standard marker:', error);
+        
+        // Fallback to standard Marker
+        marker = new google.maps.Marker({
+            position: position,
+            map: window.map,
+            animation: google.maps.Animation.DROP,
+            icon: type === 'pickup' ? 
+                'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+        });
+        
+        // Add the type property to the marker
+        marker.type = type;
+    }
     
     // Add the marker to our array
     window.markers.push(marker);
@@ -348,6 +396,63 @@ function placeMarker(location, type = window.selectedMode) {
     });
 }
 
+// Helper function to create custom HTML content for advanced markers
+function buildAdvancedMarkerContent(type) {
+    // Create a custom pin element
+    const pinElement = document.createElement('div');
+    
+    // Style based on marker type
+    if (type === 'pickup') {
+        pinElement.innerHTML = `
+            <div style="
+                width: 30px;
+                height: 30px;
+                border-radius: 50% 50% 50% 0;
+                background: #00b894;
+                transform: rotate(-45deg);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                border: 2px solid white;
+            ">
+                <div style="
+                    transform: rotate(45deg);
+                    width: 14px;
+                    height: 14px;
+                    background: white;
+                    border-radius: 50%;
+                "></div>
+            </div>
+        `;
+    } else {
+        pinElement.innerHTML = `
+            <div style="
+                width: 30px;
+                height: 30px;
+                border-radius: 50% 50% 50% 0;
+                background: #e74c3c;
+                transform: rotate(-45deg);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                border: 2px solid white;
+            ">
+                <div style="
+                    transform: rotate(45deg);
+                    width: 14px;
+                    height: 14px;
+                    background: white;
+                    border-radius: 50%;
+                "></div>
+            </div>
+        `;
+    }
+    
+    return pinElement;
+}
+
 // Function to calculate and display the route between markers
 function calculateAndDisplayRoute() {
     if (!window.directionsService || !window.directionsRenderer) return;
@@ -359,8 +464,8 @@ function calculateAndDisplayRoute() {
     if (pickupMarker && destinationMarker) {
         window.directionsService.route(
             {
-                origin: pickupMarker.position,
-                destination: destinationMarker.position,
+                origin: pickupMarker.position || pickupMarker.position,
+                destination: destinationMarker.position || destinationMarker.position,
                 travelMode: google.maps.TravelMode.DRIVING
             },
             function(response, status) {
