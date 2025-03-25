@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Salaam Rides - Book Your Ride Now</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+    <!-- Google Maps API -->
+    <script async defer loading="async" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSgFXlMiN-32DnmTbCqfLY7FhwwDebXgk&libraries=places&callback=initMap"></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo animate-fadeIn">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                    </svg>
+                    <h1>Salaam Rides</h1>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-links">
+                    <li class="animate-fadeIn delay-100"><a href="#book">Book a Ride</a></li>
+                    <li class="animate-fadeIn delay-200"><a href="#features">Features</a></li>
+                    <li class="animate-fadeIn delay-300"><a href="#about">About Us</a></li>
+                    <li class="animate-fadeIn delay-400"><a href="#contact">Contact</a></li>
+                </ul>
+                <a href="#book" class="btn btn-primary animate-fadeIn delay-500">Book Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Your Reliable Ride in Guyana, Anytime, Anywhere</h2>
+                <p>Experience safe, comfortable and affordable rides with Salaam Rides across West Bank Demerara and beyond. Just a few clicks away from your next journey.</p>
+                <a href="#book" class="btn btn-secondary">Book Your Ride Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Book Ride Section -->
+    <section class="book-ride" id="book">
+        <div class="container">
+            <h2 class="section-title">Book Your Ride</h2>
+            <div class="booking-container">
+                <div class="map-container">
+                    <div id="map"></div>
+                    <div id="map-fallback" class="map-placeholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <p>Loading map...</p>
+                        <p>Please ensure location services are enabled</p>
+                    </div>
+                    <div class="map-controls">
+                        <button class="btn btn-secondary" id="current-location">Use Current Location</button>
+                    </div>
+                </div>
+                <div class="booking-form">
+                    <h3 class="form-title">Enter Your Details</h3>
+                    <form id="ride-form">
+                        <div class="form-group">
+                            <label for="pickup">Pickup Location</label>
+                            <div class="location-input">
+                                <input type="text" id="pickup" placeholder="Enter pickup location" required>
+                                <button type="button" class="location-btn" id="pickup-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination">Destination</label>
+                            <div class="location-input">
+                                <input type="text" id="destination" placeholder="Enter destination">
+                                <button type="button" class="location-btn" id="destination-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="car-type">Car Type</label>
+                            <select id="car-type" required>
+                                <option value="">Select car type</option>
+                                <option value="economy">Economy</option>
+                                <option value="standard">Standard</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Special Notes (Optional)</label>
+                            <input type="text" id="notes" placeholder="Any special requirements?">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Request Ride</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title animate-slideUp">Why Choose Salaam Rides</h2>
+            <div class="features-container">
+                <div class="feature-card animate-slideUp delay-100">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>24/7 Service</h3>
+                    <p>We're available round the clock. Book a ride anytime, day or night, and we'll be there for you.</p>
+                </div>
+                <div class="feature-card animate-slideUp delay-200">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <h3>Safe & Secure</h3>
+                    <p>All our drivers are verified and trained. Your safety is our top priority during every ride.</p>
+                </div>
+                <div class="feature-card animate-slideUp delay-300">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <h3>Affordable Rates</h3>
+                    <p>Enjoy competitive pricing with no hidden charges. Get the best value for your money with every ride.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-container">
+                <div class="about-image"></div>
+                <div class="about-content">
+                    <h2>About Salaam Rides</h2>
+                    <p>Salaam Rides is a premier taxi service dedicated to providing convenient, reliable, and safe transportation for all our customers. Founded in 2020, we've quickly grown to become a trusted name in the transportation industry.</p>
+                    <p>Our fleet of well-maintained vehicles and professional drivers ensures that every journey with us is comfortable and stress-free. We leverage technology to provide a seamless booking experience while maintaining the personal touch that makes us unique.</p>
+                    <p>At Salaam Rides, we're committed to excellence in service and customer satisfaction. We continuously strive to improve our services and exceed the expectations of our valued customers.</p>
+                    <a href="#book" class="btn btn-primary">Book a Ride Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Salaam Rides</h3>
+                    <p>Your reliable taxi service available 24/7. Safe, comfortable, and affordable rides at your fingertips.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#book">Book a Ride</a></li>
+                        <li><a href="#features">Our Features</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            94M Independence Street, LaGrange, West Bank Demerara, Guyana
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            +592 626-6780
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            info@salaamrides.gy
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Salaam Rides. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booking Success Modal -->
+    <div class="modal" id="booking-modal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h3 class="modal-title">Booking Successful!</h3>
+            <p>Your ride has been requested successfully. A driver will be assigned to you shortly.</p>
+            <p id="booking-details"></p>
+            <button class="btn btn-primary close-modal">Close</button>
+        </div>
+    </div>
+</body>
+</html>
