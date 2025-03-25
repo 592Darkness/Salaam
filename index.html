@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1a1a2e">
     <title>Salaam Rides - Book Your Ride Now</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:,">
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
-    <!-- JavaScript -->
-    <script src="script.js"></script>
-    <!-- Google Maps API -->
-    <script async defer loading="async" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-6uXAa6MkIMwlYYwMIVBq5s3T0aTh0EI&libraries=places&callback=initMap"></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -57,7 +55,7 @@
             <h2 class="section-title">Book Your Ride</h2>
             <div class="booking-container">
                 <div class="map-container">
-                    <div id="map"></div>
+                    <div id="map" style="width: 100%; height: 100%;"></div>
                     <div id="map-fallback" class="map-placeholder">
                         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -263,5 +261,309 @@
             <button class="btn btn-primary close-modal">Close</button>
         </div>
     </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+    
+    <!-- Google Maps API with callback and EXPLICIT library loading - this is key for autocomplete -->
+    <script>
+        // Create a global initMap function that will be called when Google Maps API loads
+        window.initMap = function() {
+            console.log("Google Maps API loaded, waiting for DOM...");
+            
+            // Make sure DOM is fully loaded before trying to access map element
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(initializeMap, 100); // Small delay to ensure DOM is ready
+            } else {
+                document.addEventListener("DOMContentLoaded", function() {
+                    setTimeout(initializeMap, 100);
+                });
+            }
+        };
+        
+        // Actual map initialization function
+        function initializeMap() {
+            try {
+                console.log("Initializing map...");
+                
+                // Check if the map element exists
+                const mapElement = document.getElementById('map');
+                if (!mapElement) {
+                    console.error('Map element not found');
+                    showMapError('Map element not found. Please refresh the page.');
+                    return;
+                }
+                
+                // Only proceed if Google Maps API is loaded
+                if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+                    console.error('Google Maps API not loaded');
+                    showMapError('Google Maps API is not available. Please check your internet connection and try again.');
+                    return;
+                }
+                
+                // Default location (Guyana - West Bank Demerara area)
+                const defaultLocation = { lat: 6.8057, lng: -58.1553 };
+                
+                // Create a new map centered at the default location
+                window.map = new google.maps.Map(mapElement, {
+                    center: defaultLocation,
+                    zoom: 13,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false,
+                    zoomControl: true
+                });
+                
+                // Hide the fallback placeholder
+                const fallback = document.getElementById('map-fallback');
+                if (fallback) {
+                    fallback.style.display = 'none';
+                }
+                
+                // Initialize geocoder for address lookups
+                window.geocoder = new google.maps.Geocoder();
+                
+                // Initialize directions service for route planning
+                window.directionsService = new google.maps.DirectionsService();
+                window.directionsRenderer = new google.maps.DirectionsRenderer({
+                    map: window.map,
+                    suppressMarkers: true
+                });
+                
+                // Add a click event listener to the map
+                window.map.addListener('click', function(event) {
+                    placeMarker(event.latLng);
+                });
+                
+                // AUTOCOMPLETE SETUP - KEY PART
+                console.log("Setting up autocomplete...");
+                
+                // Verify that Places library is loaded
+                if (typeof google.maps.places === 'undefined') {
+                    console.error("Google Maps Places library not loaded!");
+                    return;
+                }
+                
+                try {
+                    // Create autocomplete for the pickup input
+                    const pickupInput = document.getElementById('pickup');
+                    if (!pickupInput) {
+                        console.error("Pickup input element not found");
+                    } else {
+                        console.log("Creating pickup autocomplete");
+                        window.pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, {
+                            fields: ["formatted_address", "geometry", "name"],
+                            strictBounds: false,
+                            types: ["geocode"]
+                        });
+                        
+                        // Prevent form submission on enter in autocomplete
+                        pickupInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                            }
+                        });
+                        
+                        // Setup autocomplete event handler
+                        window.pickupAutocomplete.addListener('place_changed', function() {
+                            console.log("Pickup place changed");
+                            const place = window.pickupAutocomplete.getPlace();
+                            if (!place.geometry) {
+                                console.warn("No geometry for selected place");
+                                return;
+                            }
+                            
+                            // If the place has a geometry, center the map
+                            window.map.setCenter(place.geometry.location);
+                            window.map.setZoom(17);
+                            
+                            // Place a marker
+                            placeMarker(place.geometry.location, 'pickup');
+                        });
+                    }
+                    
+                    // Create autocomplete for the destination input
+                    const destinationInput = document.getElementById('destination');
+                    if (!destinationInput) {
+                        console.error("Destination input element not found");
+                    } else {
+                        console.log("Creating destination autocomplete");
+                        window.destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput, {
+                            fields: ["formatted_address", "geometry", "name"],
+                            strictBounds: false,
+                            types: ["geocode"]
+                        });
+                        
+                        // Prevent form submission on enter in autocomplete
+                        destinationInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                            }
+                        });
+                        
+                        // Setup autocomplete event handler
+                        window.destinationAutocomplete.addListener('place_changed', function() {
+                            console.log("Destination place changed");
+                            const place = window.destinationAutocomplete.getPlace();
+                            if (!place.geometry) {
+                                console.warn("No geometry for selected place");
+                                return;
+                            }
+                            
+                            // If the place has a geometry, center the map
+                            window.map.setCenter(place.geometry.location);
+                            window.map.setZoom(17);
+                            
+                            // Place a marker
+                            placeMarker(place.geometry.location, 'destination');
+                            
+                            // If both markers are placed, calculate and display the route
+                            calculateAndDisplayRoute();
+                        });
+                    }
+                    
+                    console.log("Autocomplete setup successful");
+                } catch (error) {
+                    console.error("Error setting up autocomplete:", error);
+                }
+                
+                console.log('Map initialized successfully');
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                showMapError('An error occurred while initializing the map. Please refresh the page.');
+            }
+        }
+        
+        // Helper function to show map error
+        function showMapError(message) {
+            const mapElement = document.getElementById('map');
+            const fallback = document.getElementById('map-fallback');
+            
+            if (fallback) {
+                fallback.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #d32f2f;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <h3>Map Error</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
+                fallback.style.display = 'flex';
+            } else if (mapElement) {
+                mapElement.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #d32f2f;">
+                        <h3>Map Error</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Function to place a marker on the map
+        function placeMarker(location, type = window.selectedMode) {
+            if (!window.map || !google) return;
+
+            // If this is a LatLng object, convert it to a plain object
+            let position;
+            if (location instanceof google.maps.LatLng) {
+                position = {
+                    lat: location.lat(),
+                    lng: location.lng()
+                };
+            } else {
+                position = location;
+            }
+            
+            // Remove existing marker of the same type
+            window.markers = window.markers || [];
+            window.markers = window.markers.filter(marker => {
+                if (marker.type === type) {
+                    marker.setMap(null);
+                    return false;
+                }
+                return true;
+            });
+            
+            // Create a new marker
+            const marker = new google.maps.Marker({
+                position: position,
+                map: window.map,
+                animation: google.maps.Animation.DROP,
+                icon: type === 'pickup' ? 
+                    'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 
+                    'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+            });
+            
+            // Add the type property to the marker
+            marker.type = type;
+            
+            // Add the marker to our array
+            window.markers.push(marker);
+            
+            // Update the input field with the address
+            window.geocoder.geocode({ 'location': position }, function(results, status) {
+                if (status === 'OK') {
+                    if (results[0]) {
+                        if (type === 'pickup') {
+                            document.getElementById('pickup').value = results[0].formatted_address;
+                        } else {
+                            document.getElementById('destination').value = results[0].formatted_address;
+                        }
+                        
+                        // Calculate and display the route if both markers are present
+                        calculateAndDisplayRoute();
+                    }
+                }
+            });
+        }
+        
+        // Function to calculate and display the route between markers
+        function calculateAndDisplayRoute() {
+            if (!window.directionsService || !window.directionsRenderer) return;
+            
+            // Check if we have both a pickup and destination marker
+            if (!window.markers) return;
+            
+            const pickupMarker = window.markers.find(marker => marker.type === 'pickup');
+            const destinationMarker = window.markers.find(marker => marker.type === 'destination');
+            
+            if (pickupMarker && destinationMarker) {
+                window.directionsService.route(
+                    {
+                        origin: pickupMarker.position,
+                        destination: destinationMarker.position,
+                        travelMode: google.maps.TravelMode.DRIVING
+                    },
+                    function(response, status) {
+                        if (status === 'OK') {
+                            window.directionsRenderer.setDirections(response);
+                        }
+                    }
+                );
+            }
+        }
+        
+        // Load Google Maps API script dynamically
+        function loadGoogleMapsAPI() {
+            var script = document.createElement('script');
+            script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyA-6uXAa6MkIMwlYYwMIVBq5s3T0aTh0EI&libraries=places&callback=initMap";
+            script.async = true;
+            script.defer = true;
+            document.body.appendChild(script);
+        }
+        
+        // Set the global variable for selected map mode
+        window.selectedMode = 'pickup';
+        
+        // Wait for DOM before loading Maps API
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", loadGoogleMapsAPI);
+        } else {
+            loadGoogleMapsAPI();
+        }
+    </script>
 </body>
 </html>
