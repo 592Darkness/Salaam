@@ -1595,3 +1595,188 @@ gmp-advanced-marker {
         font-size: 0.9rem;
     }
 }
+
+/* NEW STYLES FOR REVAMPED SIGNUP FORM */
+
+/* Improved form validation and feedback */
+.error-message {
+    color: var(--danger-color);
+    font-size: 0.8rem;
+    margin-top: 5px;
+    min-height: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Password strength visualization */
+.password-requirements {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    background-color: var(--input-bg);
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+
+.password-requirements p {
+    margin-bottom: 5px;
+    color: var(--muted-text);
+}
+
+.password-requirements ul {
+    list-style: none;
+    padding-left: 5px;
+}
+
+.password-requirements li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+    color: var(--muted-text);
+    transition: color 0.3s ease;
+}
+
+.password-requirements li.valid {
+    color: var(--accent-color);
+}
+
+.password-requirements .check {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.password-requirements li.valid .check {
+    background-color: var(--accent-color);
+}
+
+.password-requirements li.valid .check::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 3px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg);
+}
+
+/* Form feedback message */
+.form-feedback {
+    padding: 8px 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 20px;
+    transition: all 0.3s ease;
+}
+
+.form-feedback.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: var(--danger-color);
+}
+
+.form-feedback.success {
+    background-color: rgba(0, 184, 148, 0.2);
+    color: var(--accent-color);
+}
+
+.form-feedback.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+/* Improved form styling */
+#signup-modal .form-group {
+    margin-bottom: 18px;
+}
+
+#signup-modal .modal-content {
+    max-width: 450px;
+    padding: 2rem;
+}
+
+#signup-modal input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.2);
+}
+
+#signup-modal input.error {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+#signup-modal input.valid {
+    border-color: var(--accent-color);
+}
+
+/* Improved button animations */
+.signup-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.signup-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: all 0.5s ease;
+}
+
+.signup-btn:hover::after {
+    left: 100%;
+}
+
+.signup-btn.loading {
+    pointer-events: none;
+    background-color: var(--accent-color);
+    opacity: 0.8;
+}
+
+.signup-btn.loading::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    left: calc(50% - 10px);
+    top: calc(50% - 10px);
+    animation: spinner 0.8s linear infinite;
+    z-index: 2;
+}
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+    #signup-modal .modal-content {
+        padding: 1.5rem;
+    }
+    
+    .password-requirements {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
+    
+    #signup-modal .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .signup-btn {
+        padding: 10px !important;
+    }
+}
