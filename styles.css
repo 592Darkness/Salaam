@@ -1780,3 +1780,27 @@ gmp-advanced-marker {
         padding: 10px !important;
     }
 }
+/* Device-specific controls - Add this at the end of your styles.css file */
+
+/* Hide the "Use Current Location" button on desktop/large screens */
+@media (min-width: 769px) {
+    #current-location {
+        display: none !important;
+    }
+    
+    /* Optional: Adjust map container styling when location button is hidden */
+    .map-controls {
+        justify-content: center;
+    }
+}
+
+/* Explicitly show on mobile screens */
+@media (max-width: 768px) {
+    #current-location {
+        display: flex !important;
+    }
+    
+    .map-controls {
+        display: flex !important;
+    }
+}
