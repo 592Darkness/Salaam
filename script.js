@@ -1377,76 +1377,150 @@ function getCurrentLocation() {
     
     if (currentLocationBtn) {
         currentLocationBtn.classList.add('btn-loading');
+        currentLocationBtn.innerText = "Locating...";
     }
     
     if (pickupInput) {
         pickupInput.value = "Getting your location...";
     }
     
-    navigator.geolocation.getCurrentPosition(
-        // Success callback
-        (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const currentLocation = new google.maps.LatLng(lat, lng);
-            
-            // Center the map on the current location
-            if (window.map) {
-                window.map.setCenter(currentLocation);
-                window.map.setZoom(17);
+    // Try first with high accuracy
+    tryGeolocate(true);
+    
+    // Function to attempt geolocation with fallbacks
+    function tryGeolocate(highAccuracy) {
+        navigator.geolocation.getCurrentPosition(
+            // Success callback
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy; // Accuracy in meters
+                const currentLocation = new google.maps.LatLng(lat, lng);
+                
+                console.log(`Location obtained with accuracy: ${accuracy} meters`);
+                
+                // Center the map on the current location
+                if (window.map) {
+                    window.map.setCenter(currentLocation);
+                    // Adjust zoom based on accuracy
+                    const zoomLevel = accuracy < 100 ? 18 : 
+                                    accuracy < 500 ? 17 : 
+                                    accuracy < 1000 ? 16 : 15;
+                    window.map.setZoom(zoomLevel);
+                }
+                
+                // Use improved reverse geocoding
+                enhancedReverseGeocode(currentLocation, accuracy);
+                
+                if (currentLocationBtn) {
+                    currentLocationBtn.classList.remove('btn-loading');
+                    currentLocationBtn.innerText = "Use Current Location";
+                }
+            },
+            // Error callback - with fallback to less accurate method
+            (error) => {
+                console.warn(`Geolocation error (highAccuracy=${highAccuracy}):`, error.code, error.message);
+                
+                // If high accuracy failed, try with lower accuracy
+                if (highAccuracy) {
+                    console.log("High accuracy location failed, trying with lower accuracy...");
+                    tryGeolocate(false);
+                    return;
+                }
+                
+                // Reset button if all attempts failed
+                if (currentLocationBtn) {
+                    currentLocationBtn.classList.remove('btn-loading');
+                    currentLocationBtn.innerText = "Use Current Location";
+                }
+                
+                let errorMsg = "Unable to access your precise location. ";
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMsg += "Please check your browser's location permissions and make sure they're enabled for this site.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMsg += "Location information is unavailable. On PCs, this may be due to lack of GPS hardware.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMsg += "The request timed out. Please ensure you have a stable internet connection and try again.";
+                        break;
+                    default:
+                        errorMsg += "An unknown error occurred. Please try entering your location manually.";
+                        break;
+                }
+                
+                if (pickupInput) {
+                    pickupInput.value = "";
+                }
+                
+                // Display error as notification rather than alert
+                showNotification(errorMsg, "error");
+            },
+            // Options
+            {
+                enableHighAccuracy: highAccuracy,
+                timeout: highAccuracy ? 10000 : 15000, // Longer timeout for fallback
+                maximumAge: highAccuracy ? 0 : 60000 // Allow cached results for fallback
+            }
+        );
+    }
+    
+    // Enhanced reverse geocoding with better address resolution
+    function enhancedReverseGeocode(location, accuracy) {
+        if (!window.geocoder) return;
+        
+        // Place a marker immediately while we wait for the address
+        placeMarker(location, 'pickup');
+        
+        // Use geocoder to get address
+        window.geocoder.geocode({ 'location': location }, function(results, status) {
+            if (status === 'OK') {
+                if (results[0]) {
+                    // Get the most accurate result
+                    let bestResult = results[0];
+                    
+                    // Try to find a result that has a street address rather than just a region
+                    for (let i = 0; i < results.length; i++) {
+                        if (results[i].types.includes('street_address') || 
+                            results[i].types.includes('premise') ||
+                            results[i].types.includes('route')) {
+                            bestResult = results[i];
+                            break;
+                        }
+                    }
+                    
+                    // Update pickup input with the formatted address
+                    if (pickupInput) {
+                        pickupInput.value = bestResult.formatted_address;
+                        
+                        // Add a small animation to the input
+                        pickupInput.style.backgroundColor = 'rgba(0, 184, 148, 0.2)';
+                        setTimeout(() => {
+                            pickupInput.style.transition = 'background-color 0.5s ease';
+                            pickupInput.style.backgroundColor = '';
+                        }, 1000);
+                    }
+                    
+                    // If accuracy is low, inform the user
+                    if (accuracy > 500) {
+                        showNotification(`Location found, but accuracy is approximately ${Math.round(accuracy)}m. You may need to adjust the pin for a more precise pickup location.`, "info");
+                    }
+                } else {
+                    console.warn('No results found for geocoding');
+                    showNotification("Location found, but we couldn't determine the address. Please enter it manually or adjust the pin for better accuracy.", "warning");
+                }
+            } else {
+                console.error('Geocoder failed due to: ' + status);
+                if (pickupInput) {
+                    pickupInput.value = `Location (${location.lat().toFixed(5)}, ${location.lng().toFixed(5)})`;
+                }
+                showNotification("We found your coordinates but couldn't convert them to an address. You may need to enter it manually.", "warning");
             }
             
-            // Place a marker at the current location
-            placeMarker(currentLocation, 'pickup');
-            
-            if (currentLocationBtn) {
-                currentLocationBtn.classList.remove('btn-loading');
-            }
-            
-            // Add a small animation to the input
-            if (pickupInput) {
-                pickupInput.style.backgroundColor = 'rgba(0, 184, 148, 0.2)';
-                setTimeout(() => {
-                    pickupInput.style.transition = 'background-color 0.5s ease';
-                    pickupInput.style.backgroundColor = '';
-                }, 1000);
-            }
-        },
-        // Error callback - improved error message
-        (error) => {
-            if (currentLocationBtn) {
-                currentLocationBtn.classList.remove('btn-loading');
-            }
-            
-            let errorMsg = "Unable to access your location. ";
-            
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMsg += "Please check your browser's location permissions.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMsg += "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    errorMsg += "The request timed out. Please try again.";
-                    break;
-                default:
-                    errorMsg += "An unknown error occurred.";
-                    break;
-            }
-            
-            if (pickupInput) {
-                pickupInput.value = "";
-            }
-            
-            // Display error in more user-friendly way
-            alert(errorMsg);
-        },
-        // Options - reduced timeout for better UX
-        {
-            enableHighAccuracy: true,
-            timeout: 7000, // Reduced from 10000
-            maximumAge: 0
-        }
-    );
+            // Calculate and display the route if destination is set
+            calculateAndDisplayRoute();
+        });
+    }
 }
