@@ -174,7 +174,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize animation on scroll
     setupAnimations();
+    
+    // Check if we should open login modal from URL parameter
+    checkLoginParam();
 });
+
+// Function to check URL for login parameter and open modal if needed
+function checkLoginParam() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login') === 'true') {
+        // Open login modal
+        const loginModal = document.getElementById('login-modal');
+        if (loginModal) {
+            openModal(loginModal);
+            
+            // Remove the parameter from URL without refreshing
+            const newUrl = window.location.pathname + window.location.hash;
+            history.replaceState(null, '', newUrl);
+        }
+    }
+}
 
 // Function to set up all DOM element references
 function setupDOMElements() {
