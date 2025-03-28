@@ -32,8 +32,13 @@
                     <li class="animate-fadeIn delay-200"><a href="#features">Features</a></li>
                     <li class="animate-fadeIn delay-300"><a href="#about">About Us</a></li>
                     <li class="animate-fadeIn delay-400"><a href="#contact">Contact</a></li>
+                    <li class="animate-fadeIn delay-500"><a href="#" id="account-link">My Account</a></li>
                 </ul>
-                <a href="#book" class="btn btn-primary animate-fadeIn delay-500">Book Now</a>
+                <div class="account-buttons animate-fadeIn delay-500">
+                    <button id="login-btn" class="btn btn-outline">Login</button>
+                    <button id="signup-btn" class="btn btn-primary">Sign Up</button>
+                </div>
+                <a href="#book" class="btn btn-primary animate-fadeIn delay-500 book-now-btn">Book Now</a>
             </nav>
         </div>
     </header>
@@ -70,6 +75,10 @@
                 </div>
                 <div class="booking-form">
                     <h3 class="form-title">Enter Your Details</h3>
+                    <div class="booking-tabs">
+                        <button class="booking-tab active" data-tab="now">Book Now</button>
+                        <button class="booking-tab" data-tab="schedule">Schedule Ride</button>
+                    </div>
                     <form id="ride-form">
                         <div class="form-group">
                             <label for="pickup">Pickup Location</label>
@@ -95,6 +104,19 @@
                                 </button>
                             </div>
                         </div>
+                        
+                        <!-- Schedule Ride Options - Initially Hidden -->
+                        <div id="schedule-options" class="schedule-options" style="display: none;">
+                            <div class="form-group">
+                                <label for="ride-date">Date</label>
+                                <input type="date" id="ride-date" min="" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ride-time">Time</label>
+                                <input type="time" id="ride-time" required>
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="name">Your Name</label>
                             <input type="text" id="name" placeholder="Enter your full name" required>
@@ -116,7 +138,7 @@
                             <label for="notes">Special Notes (Optional)</label>
                             <input type="text" id="notes" placeholder="Any special requirements?">
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Request Ride</button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="ride-submit-btn">Request Ride</button>
                     </form>
                 </div>
             </div>
@@ -156,6 +178,18 @@
                     </div>
                     <h3>Affordable Rates</h3>
                     <p>Enjoy competitive pricing with no hidden charges. Get the best value for your money with every ride.</p>
+                </div>
+                <div class="feature-card animate-slideUp delay-400">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h3>Easy Scheduling</h3>
+                    <p>Plan your trips in advance and schedule rides for later. We'll be there exactly when you need us.</p>
                 </div>
             </div>
         </div>
@@ -246,9 +280,120 @@
         </div>
     </footer>
 
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <button class="modal-close">×</button>
+            <div class="modal-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                    <polyline points="10 17 15 12 10 7"></polyline>
+                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+            </div>
+            <h3 class="modal-title">Login to Your Account</h3>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                        <button type="button" class="toggle-password">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signup-modal">
+        <div class="modal-content">
+            <button class="modal-close">×</button>
+            <div class="modal-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+            </div>
+            <h3 class="modal-title">Create Your Account</h3>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-phone">Phone Number</label>
+                    <input type="tel" id="signup-phone" placeholder="Enter your phone number" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="signup-password" placeholder="Create a password" required>
+                        <button type="button" class="toggle-password">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <div class="password-input">
+                        <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required>
+                        <button type="button" class="toggle-password">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="terms-agree" required>
+                        <span class="checkmark"></span>
+                        I agree to the <a href="#">Terms and Conditions</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#" id="switch-to-login">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Booking Success Modal -->
     <div class="modal" id="booking-modal">
         <div class="modal-content">
+            <button class="modal-close">×</button>
             <div class="modal-icon">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -256,9 +401,171 @@
                 </svg>
             </div>
             <h3 class="modal-title">Booking Successful!</h3>
-            <p>Your ride has been requested successfully. A driver will be assigned to you shortly.</p>
-            <p id="booking-details"></p>
+            <p>Your ride has been requested successfully.</p>
+            <div id="booking-details" class="booking-details"></div>
             <button class="btn btn-primary close-modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Account Dashboard Modal -->
+    <div class="modal" id="account-modal">
+        <div class="modal-content dashboard-content">
+            <button class="modal-close">×</button>
+            <h3 class="modal-title">My Account</h3>
+            
+            <div class="dashboard-tabs">
+                <button class="dashboard-tab active" data-tab="profile">Profile</button>
+                <button class="dashboard-tab" data-tab="rides">My Rides</button>
+                <button class="dashboard-tab" data-tab="scheduled">Scheduled Rides</button>
+            </div>
+            
+            <div class="dashboard-content">
+                <!-- Profile Tab -->
+                <div class="dashboard-panel active" id="profile-panel">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="profile-details">
+                            <h4 id="profile-name">John Doe</h4>
+                            <p id="profile-email">johndoe@example.com</p>
+                            <p id="profile-phone">+592 123-4567</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm edit-profile-btn">Edit Profile</button>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-rides">12</span>
+                            <span class="stat-label">Total Rides</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="upcoming-rides">2</span>
+                            <span class="stat-label">Upcoming</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★ 4.9</span>
+                            <span class="stat-label">Rating</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Edit Profile Form - Initially Hidden -->
+                    <form id="edit-profile-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="edit-name">Name</label>
+                            <input type="text" id="edit-name" value="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">Email</label>
+                            <input type="email" id="edit-email" value="johndoe@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-phone">Phone</label>
+                            <input type="tel" id="edit-phone" value="+592 123-4567">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline cancel-edit">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- My Rides Tab -->
+                <div class="dashboard-panel" id="rides-panel">
+                    <div class="rides-list" id="past-rides-list">
+                        <div class="ride-item">
+                            <div class="ride-info">
+                                <div class="ride-date">March 25, 2025</div>
+                                <div class="ride-route">
+                                    <div class="ride-point">
+                                        <span class="point-marker pickup"></span>
+                                        <span class="point-address">94M Independence Street, LaGrange</span>
+                                    </div>
+                                    <div class="ride-point">
+                                        <span class="point-marker destination"></span>
+                                        <span class="point-address">Georgetown Mall, Georgetown</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ride-details">
+                                <div class="ride-price">$15.75</div>
+                                <div class="ride-status completed">Completed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ride-item">
+                            <div class="ride-info">
+                                <div class="ride-date">March 22, 2025</div>
+                                <div class="ride-route">
+                                    <div class="ride-point">
+                                        <span class="point-marker pickup"></span>
+                                        <span class="point-address">Georgetown Mall, Georgetown</span>
+                                    </div>
+                                    <div class="ride-point">
+                                        <span class="point-marker destination"></span>
+                                        <span class="point-address">94M Independence Street, LaGrange</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ride-details">
+                                <div class="ride-price">$14.50</div>
+                                <div class="ride-status completed">Completed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="empty-state" style="display: none;">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <p>You haven't taken any rides yet.</p>
+                            <a href="#book" class="btn btn-primary close-modal">Book Your First Ride</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scheduled Rides Tab -->
+                <div class="dashboard-panel" id="scheduled-panel">
+                    <div class="rides-list" id="scheduled-rides-list">
+                        <div class="ride-item scheduled">
+                            <div class="ride-info">
+                                <div class="ride-date">March 30, 2025 - 9:30 AM</div>
+                                <div class="ride-route">
+                                    <div class="ride-point">
+                                        <span class="point-marker pickup"></span>
+                                        <span class="point-address">94M Independence Street, LaGrange</span>
+                                    </div>
+                                    <div class="ride-point">
+                                        <span class="point-marker destination"></span>
+                                        <span class="point-address">Cheddi Jagan Airport</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ride-actions">
+                                <button class="btn btn-outline btn-sm cancel-ride">Cancel</button>
+                                <button class="btn btn-primary btn-sm edit-ride">Edit</button>
+                            </div>
+                        </div>
+                        
+                        <div class="empty-state" style="display: none;">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <p>You don't have any scheduled rides.</p>
+                            <a href="#book" class="btn btn-primary close-modal">Schedule a Ride Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-outline logout-btn">Logout</button>
         </div>
     </div>
 
