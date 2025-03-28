@@ -159,6 +159,15 @@ function showMapError(message) {
     }
 }
 
+// Function to check if device is mobile
+function isMobileDevice() {
+    // Check if the device is mobile based on screen size or user agent
+    const isMobileBySize = window.innerWidth <= 768;
+    const isMobileByAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    return isMobileBySize || isMobileByAgent;
+}
+
 // DOM Elements
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded, setting up event listeners");
@@ -177,6 +186,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check if we should open login modal from URL parameter
     checkLoginParam();
+    
+    // Setup device-specific elements (hide/show location button)
+    setupDeviceSpecificElements();
+    
+    // Setup resize listener for device detection
+    window.addEventListener('resize', setupDeviceSpecificElements);
 });
 
 // Function to check URL for login parameter and open modal if needed
@@ -285,6 +300,24 @@ function setupDOMElements() {
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         window.elements.rideTimeInput.value = `${hours}:${minutes}`;
+    }
+}
+
+// Function to set up device-specific elements
+function setupDeviceSpecificElements() {
+    const currentLocationBtn = document.getElementById('current-location');
+    const desktopMessage = document.querySelector('.desktop-location-message');
+    
+    if (!currentLocationBtn) return;
+    
+    if (isMobileDevice()) {
+        // Show the button on mobile devices
+        currentLocationBtn.style.display = 'flex';
+        if (desktopMessage) desktopMessage.style.display = 'none';
+    } else {
+        // Hide the button on desktop/PC
+        currentLocationBtn.style.display = 'none';
+        if (desktopMessage) desktopMessage.style.display = 'block';
     }
 }
 
@@ -457,6 +490,9 @@ function initializeUI() {
     
     // Check empty ride lists
     checkEmptyRides();
+    
+    // Set up device-specific elements
+    setupDeviceSpecificElements();
 }
 
 // Setup animations
@@ -1474,9 +1510,8 @@ function getCurrentLocation() {
         });
     }
 }
-// Add this at the end of your script.js file
 
-// Debug function to help identify what's happening with the map
+// Debug function to help troubleshoot map and location issues
 function debugMapVisibility() {
     // Elements to check
     const mapContainer = document.querySelector('.map-container');
@@ -1520,36 +1555,4 @@ function debugMapVisibility() {
     console.log('Is mobile (by size):', window.innerWidth <= 768);
     console.log('Is mobile (by agent):', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     console.log('Window width:', window.innerWidth);
-    
-    // Add visual indicator for debugging on the page
-    const debugInfo = document.createElement('div');
-    debugInfo.style.position = 'fixed';
-    debugInfo.style.top = '10px';
-    debugInfo.style.right = '10px';
-    debugInfo.style.padding = '10px';
-    debugInfo.style.background = 'rgba(0,0,0,0.7)';
-    debugInfo.style.color = 'white';
-    debugInfo.style.borderRadius = '5px';
-    debugInfo.style.zIndex = '9999';
-    debugInfo.style.fontSize = '12px';
-    debugInfo.innerHTML = `
-        <p>Width: ${window.innerWidth}px</p>
-        <p>Map container: ${mapContainer ? 'exists' : 'missing'}</p>
-        <p>Map element: ${map ? 'exists' : 'missing'}</p>
-        <p>Location btn: ${currentLocationBtn ? 'exists' : 'missing'}</p>
-    `;
-    document.body.appendChild(debugInfo);
-    
-    // Remove after 10 seconds
-    setTimeout(() => {
-        if (document.body.contains(debugInfo)) {
-            document.body.removeChild(debugInfo);
-        }
-    }, 10000);
 }
-
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a moment for everything to initialize
-    setTimeout(debugMapVisibility, 1000);
-});
