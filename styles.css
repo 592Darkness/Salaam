@@ -1076,7 +1076,7 @@ gmp-advanced-marker {
 }
 
 .form-options {
-    margin: 15px 0;
+    margin: 15px 0 25px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1088,11 +1088,20 @@ gmp-advanced-marker {
     margin-top: 20px;
     text-align: center;
     color: var(--muted-text);
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .form-footer a {
     color: var(--accent-color);
     text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.form-footer a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
 .checkbox-container {
@@ -1102,6 +1111,9 @@ gmp-advanced-marker {
     padding-left: 30px;
     cursor: pointer;
     user-select: none;
+    margin: 5px 0;
+    text-align: left;
+    font-size: 0.9rem;
 }
 
 .checkbox-container input {
