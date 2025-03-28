@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Sign Up - Salaam Rides</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:,">
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="signup.css">
+</head>
+<body class="signup-page">
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo animate-fadeIn">
+                    <a href="index.html">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                        </svg>
+                        <h1>Salaam Rides</h1>
+                    </a>
+                </div>
+                <div class="nav-buttons">
+                    <a href="index.html" class="btn btn-outline">Back to Home</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Signup Section -->
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                <div class="signup-card">
+                    <div class="signup-header">
+                        <div class="signup-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <line x1="20" y1="8" x2="20" y2="14"></line>
+                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                            </svg>
+                        </div>
+                        <h2>Create Your Account</h2>
+                        <p>Join Salaam Rides today for safe and reliable transportation across Guyana.</p>
+                    </div>
+                    
+                    <form id="signup-form" novalidate>
+                        <div class="form-group">
+                            <label for="signup-name">Full Name</label>
+                            <input type="text" id="signup-name" placeholder="Enter your full name" required 
+                                   aria-describedby="name-error" autocomplete="name">
+                            <div id="name-error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-email">Email</label>
+                            <input type="email" id="signup-email" placeholder="Enter your email" required 
+                                   aria-describedby="email-error" autocomplete="email">
+                            <div id="email-error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-phone">Phone Number</label>
+                            <input type="tel" id="signup-phone" placeholder="Enter your phone number" required 
+                                   aria-describedby="phone-error" autocomplete="tel">
+                            <div id="phone-error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signup-password" placeholder="Create a password" required 
+                                       aria-describedby="password-error" autocomplete="new-password"
+                                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$">
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="password-error" class="error-message"></div>
+                            <div class="password-requirements">
+                                <p>Password must contain:</p>
+                                <ul>
+                                    <li id="req-length"><span class="check"></span> At least 8 characters</li>
+                                    <li id="req-uppercase"><span class="check"></span> One uppercase letter</li>
+                                    <li id="req-lowercase"><span class="check"></span> One lowercase letter</li>
+                                    <li id="req-number"><span class="check"></span> One number</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-confirm-password">Confirm Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required 
+                                       aria-describedby="confirm-password-error" autocomplete="new-password">
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="confirm-password-error" class="error-message"></div>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="terms-agree" required aria-describedby="terms-error">
+                                <span class="checkmark"></span>
+                                I agree to the <a href="#" tabindex="0">Terms and Conditions</a> and <a href="#" tabindex="0">Privacy Policy</a>
+                            </label>
+                            <div id="terms-error" class="error-message"></div>
+                        </div>
+                        <div class="form-feedback" aria-live="polite"></div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary signup-btn">
+                                Create Account
+                            </button>
+                        </div>
+                        <div class="form-footer">
+                            <p>Already have an account? <a href="login.html">Login</a></p>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="signup-benefits">
+                    <h3>Benefits of Joining Salaam Rides</h3>
+                    <ul class="benefits-list">
+                        <li>
+                            <div class="benefit-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                </svg>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Quick Booking</h4>
+                                <p>Book rides in seconds with our easy-to-use platform.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="benefit-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Safe & Secure</h4>
+                                <p>All our drivers are verified and trained for your safety.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="benefit-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Schedule Rides</h4>
+                                <p>Plan ahead by scheduling rides for future dates and times.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="benefit-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Competitive Pricing</h4>
+                                <p>Enjoy affordable rates with no hidden charges.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="signup-footer">
+        <div class="container">
+            <div class="footer-simple">
+                <div class="footer-logo">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                    </svg>
+                    <span>Salaam Rides</span>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#about">About</a>
+                    <a href="index.html#contact">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms & Conditions</a>
+                </div>
+                <div class="copyright">
+                    <p>&copy; 2025 Salaam Rides. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <div class="modal-icon success-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h3 class="modal-title">Account Created Successfully!</h3>
+            <p>Welcome to Salaam Rides. Your account has been created and you're now ready to book your first ride.</p>
+            <div class="modal-actions">
+                <a href="index.html" class="btn btn-primary">Go to Homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="signup.js"></script>
+</body>
+</html>
