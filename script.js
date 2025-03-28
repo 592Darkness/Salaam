@@ -1474,3 +1474,82 @@ function getCurrentLocation() {
         });
     }
 }
+// Add this at the end of your script.js file
+
+// Debug function to help identify what's happening with the map
+function debugMapVisibility() {
+    // Elements to check
+    const mapContainer = document.querySelector('.map-container');
+    const map = document.getElementById('map');
+    const mapFallback = document.getElementById('map-fallback');
+    const mapControls = document.querySelector('.map-controls');
+    const currentLocationBtn = document.getElementById('current-location');
+    
+    // Check if elements exist
+    console.log('Map container exists:', !!mapContainer);
+    console.log('Map element exists:', !!map);
+    console.log('Map fallback exists:', !!mapFallback);
+    console.log('Map controls exists:', !!mapControls);
+    console.log('Current location button exists:', !!currentLocationBtn);
+    
+    // Check display values
+    if (mapContainer) {
+        const mapContainerStyle = window.getComputedStyle(mapContainer);
+        console.log('Map container display:', mapContainerStyle.display);
+        console.log('Map container visibility:', mapContainerStyle.visibility);
+        console.log('Map container dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+    }
+    
+    if (map) {
+        const mapStyle = window.getComputedStyle(map);
+        console.log('Map display:', mapStyle.display);
+        console.log('Map visibility:', mapStyle.visibility);
+    }
+    
+    if (mapControls) {
+        const mapControlsStyle = window.getComputedStyle(mapControls);
+        console.log('Map controls display:', mapControlsStyle.display);
+    }
+    
+    if (currentLocationBtn) {
+        const btnStyle = window.getComputedStyle(currentLocationBtn);
+        console.log('Location button display:', btnStyle.display);
+    }
+    
+    // Check device type
+    console.log('Is mobile (by size):', window.innerWidth <= 768);
+    console.log('Is mobile (by agent):', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    console.log('Window width:', window.innerWidth);
+    
+    // Add visual indicator for debugging on the page
+    const debugInfo = document.createElement('div');
+    debugInfo.style.position = 'fixed';
+    debugInfo.style.top = '10px';
+    debugInfo.style.right = '10px';
+    debugInfo.style.padding = '10px';
+    debugInfo.style.background = 'rgba(0,0,0,0.7)';
+    debugInfo.style.color = 'white';
+    debugInfo.style.borderRadius = '5px';
+    debugInfo.style.zIndex = '9999';
+    debugInfo.style.fontSize = '12px';
+    debugInfo.innerHTML = `
+        <p>Width: ${window.innerWidth}px</p>
+        <p>Map container: ${mapContainer ? 'exists' : 'missing'}</p>
+        <p>Map element: ${map ? 'exists' : 'missing'}</p>
+        <p>Location btn: ${currentLocationBtn ? 'exists' : 'missing'}</p>
+    `;
+    document.body.appendChild(debugInfo);
+    
+    // Remove after 10 seconds
+    setTimeout(() => {
+        if (document.body.contains(debugInfo)) {
+            document.body.removeChild(debugInfo);
+        }
+    }, 10000);
+}
+
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a moment for everything to initialize
+    setTimeout(debugMapVisibility, 1000);
+});
