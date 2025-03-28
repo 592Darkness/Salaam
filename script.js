@@ -127,6 +127,9 @@ window.initMap = function() {
 // Global variables
 window.markers = [];
 window.selectedMode = 'pickup'; // 'pickup' or 'destination'
+window.isScheduled = false; // Flag for scheduled rides
+window.isLoggedIn = false; // User login state
+window.userData = null; // User data storage
 
 // Function to show map error
 function showMapError(message) {
@@ -160,44 +163,297 @@ function showMapError(message) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded, setting up event listeners");
     
-    const rideForm = document.getElementById('ride-form');
-    const bookingModal = document.getElementById('booking-modal');
-    const bookingDetails = document.getElementById('booking-details');
-    const closeModalBtn = document.querySelector('.close-modal');
-    const currentLocationBtn = document.getElementById('current-location');
-    const hamburgerBtn = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    const body = document.body;
-    const pickupInput = document.getElementById('pickup');
-    const destinationInput = document.getElementById('destination');
-    const nameInput = document.getElementById('name');
-    const phoneInput = document.getElementById('phone');
-    const carTypeSelect = document.getElementById('car-type');
-    const notesInput = document.getElementById('notes');
+    // Get DOM elements
+    setupDOMElements();
     
-    // Mobile Navigation
-    if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', () => {
-            body.classList.toggle('nav-active');
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Initialize UI based on current state
+    initializeUI();
+
+    // Initialize animation on scroll
+    setupAnimations();
+});
+
+// Function to set up all DOM element references
+function setupDOMElements() {
+    // Main UI Elements
+    window.elements = {
+        // Form elements
+        rideForm: document.getElementById('ride-form'),
+        pickupInput: document.getElementById('pickup'),
+        destinationInput: document.getElementById('destination'),
+        nameInput: document.getElementById('name'),
+        phoneInput: document.getElementById('phone'),
+        carTypeSelect: document.getElementById('car-type'),
+        notesInput: document.getElementById('notes'),
+        rideDateInput: document.getElementById('ride-date'),
+        rideTimeInput: document.getElementById('ride-time'),
+        scheduleOptions: document.getElementById('schedule-options'),
+        rideSubmitBtn: document.getElementById('ride-submit-btn'),
+        
+        // Booking tabs
+        bookingTabs: document.querySelectorAll('.booking-tab'),
+        
+        // Map controls
+        currentLocationBtn: document.getElementById('current-location'),
+        pickupBtn: document.getElementById('pickup-btn'),
+        destinationBtn: document.getElementById('destination-btn'),
+        
+        // Account elements
+        loginBtn: document.getElementById('login-btn'),
+        signupBtn: document.getElementById('signup-btn'),
+        accountLink: document.getElementById('account-link'),
+        accountButtons: document.querySelector('.account-buttons'),
+        
+        // Account modals
+        loginModal: document.getElementById('login-modal'),
+        signupModal: document.getElementById('signup-modal'),
+        accountModal: document.getElementById('account-modal'),
+        
+        // Account forms
+        loginForm: document.getElementById('login-form'),
+        signupForm: document.getElementById('signup-form'),
+        editProfileForm: document.getElementById('edit-profile-form'),
+        
+        // Dashboard elements
+        dashboardTabs: document.querySelectorAll('.dashboard-tab'),
+        dashboardPanels: document.querySelectorAll('.dashboard-panel'),
+        profilePanel: document.getElementById('profile-panel'),
+        ridesPanel: document.getElementById('rides-panel'),
+        scheduledPanel: document.getElementById('scheduled-panel'),
+        
+        // Profile elements
+        profileName: document.getElementById('profile-name'),
+        profileEmail: document.getElementById('profile-email'),
+        profilePhone: document.getElementById('profile-phone'),
+        editProfileBtn: document.querySelector('.edit-profile-btn'),
+        cancelEditBtn: document.querySelector('.cancel-edit'),
+        logoutBtn: document.querySelector('.logout-btn'),
+        
+        // Dashboard ride lists
+        pastRidesList: document.getElementById('past-rides-list'),
+        scheduledRidesList: document.getElementById('scheduled-rides-list'),
+        
+        // Booking modal
+        bookingModal: document.getElementById('booking-modal'),
+        bookingDetails: document.getElementById('booking-details'),
+        closeModalBtns: document.querySelectorAll('.close-modal'),
+        
+        // Navigation
+        hamburgerBtn: document.querySelector('.hamburger'),
+        navLinks: document.querySelector('.nav-links'),
+        body: document.body,
+        
+        // Modal close buttons
+        modalCloseBtns: document.querySelectorAll('.modal-close'),
+        
+        // Tab switching
+        switchToLogin: document.getElementById('switch-to-login'),
+        switchToSignup: document.getElementById('switch-to-signup')
+    };
+    
+    // Set the minimum date for the date picker to today
+    if (window.elements.rideDateInput) {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        window.elements.rideDateInput.min = formattedDate;
+        window.elements.rideDateInput.value = formattedDate;
+    }
+    
+    // Set a reasonable default time (1 hour from now)
+    if (window.elements.rideTimeInput) {
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0);
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        window.elements.rideTimeInput.value = `${hours}:${minutes}`;
+    }
+}
+
+// Function to set up all event listeners
+function setupEventListeners() {
+    const el = window.elements;
+    
+    // Form submission
+    if (el.rideForm) el.rideForm.addEventListener('submit', handleBooking);
+    
+    // Booking tabs
+    el.bookingTabs.forEach(tab => {
+        tab.addEventListener('click', () => switchBookingTab(tab.dataset.tab));
+    });
+    
+    // Map controls
+    if (el.currentLocationBtn) el.currentLocationBtn.addEventListener('click', getCurrentLocation);
+    if (el.pickupBtn) el.pickupBtn.addEventListener('click', selectOnMap);
+    if (el.destinationBtn) el.destinationBtn.addEventListener('click', selectDestination);
+    
+    // Account buttons
+    if (el.loginBtn) el.loginBtn.addEventListener('click', () => openModal(el.loginModal));
+    if (el.signupBtn) el.signupBtn.addEventListener('click', () => openModal(el.signupModal));
+    if (el.accountLink) el.accountLink.addEventListener('click', handleAccountClick);
+    
+    // Account forms
+    if (el.loginForm) el.loginForm.addEventListener('submit', handleLogin);
+    if (el.signupForm) el.signupForm.addEventListener('submit', handleSignup);
+    if (el.editProfileForm) el.editProfileForm.addEventListener('submit', handleProfileUpdate);
+    
+    // Dashboard tabs
+    el.dashboardTabs.forEach(tab => {
+        tab.addEventListener('click', () => switchDashboardTab(tab.dataset.tab));
+    });
+    
+    // Profile actions
+    if (el.editProfileBtn) el.editProfileBtn.addEventListener('click', toggleEditProfile);
+    if (el.cancelEditBtn) el.cancelEditBtn.addEventListener('click', toggleEditProfile);
+    if (el.logoutBtn) el.logoutBtn.addEventListener('click', handleLogout);
+    
+    // Close modals
+    el.modalCloseBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const modal = e.target.closest('.modal');
+            closeModal(modal);
+        });
+    });
+    
+    // Close specific modal buttons
+    el.closeModalBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modal = btn.closest('.modal');
+            closeModal(modal);
+        });
+    });
+    
+    // Mobile navigation
+    if (el.hamburgerBtn) {
+        el.hamburgerBtn.addEventListener('click', () => {
+            el.body.classList.toggle('nav-active');
         });
     }
-
+    
     // Close mobile menu when clicking on a link
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
-            body.classList.remove('nav-active');
+            el.body.classList.remove('nav-active');
         });
     });
-
+    
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (body.classList.contains('nav-active') && 
+        if (el.body.classList.contains('nav-active') && 
             !e.target.closest('.nav-links') && 
             !e.target.closest('.hamburger')) {
-            body.classList.remove('nav-active');
+            el.body.classList.remove('nav-active');
         }
     });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target);
+        }
+    });
+    
+    // Switch between login/signup tabs
+    if (el.switchToLogin) el.switchToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal(el.signupModal);
+        openModal(el.loginModal);
+    });
+    
+    if (el.switchToSignup) el.switchToSignup.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal(el.loginModal);
+        openModal(el.signupModal);
+    });
+    
+    // Password visibility toggle
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Change icon
+            const svg = this.querySelector('svg');
+            if (type === 'text') {
+                svg.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                svg.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+        });
+    });
+    
+    // Edit and cancel scheduled rides
+    document.querySelectorAll('.edit-ride').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const rideItem = this.closest('.ride-item');
+            // In a real app, we would handle editing here
+            alert('Edit functionality would open a form to modify this scheduled ride.');
+        });
+    });
+    
+    document.querySelectorAll('.cancel-ride').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const rideItem = this.closest('.ride-item');
+            if (confirm('Are you sure you want to cancel this scheduled ride?')) {
+                // In a real app, we would handle cancellation here
+                rideItem.remove();
+                checkEmptyRides();
+            }
+        });
+    });
+    
+    // Tab focus handlers for map marker selection
+    if (el.pickupInput) {
+        el.pickupInput.addEventListener('focus', () => {
+            window.selectedMode = 'pickup';
+        });
+    }
+    
+    if (el.destinationInput) {
+        el.destinationInput.addEventListener('focus', () => {
+            window.selectedMode = 'destination';
+        });
+    }
+}
 
+// Initialize UI based on current state
+function initializeUI() {
+    const el = window.elements;
+    
+    // Check local storage for login state
+    checkLoginState();
+    
+    // Add pulse animation to buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', () => {
+            button.style.animation = 'pulse 0.5s ease';
+        });
+        
+        button.addEventListener('animationend', () => {
+            button.style.animation = '';
+        });
+    });
+    
+    // Set the default booking mode to "now"
+    switchBookingTab('now');
+    
+    // Check empty ride lists
+    checkEmptyRides();
+}
+
+// Setup animations
+function setupAnimations() {
     // Animation on scroll - with performance optimization for mobile
     let isMobile = window.innerWidth <= 768;
 
@@ -239,32 +495,9 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Event Listeners
-    if (rideForm) rideForm.addEventListener('submit', handleBooking);
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    if (currentLocationBtn) currentLocationBtn.addEventListener('click', getCurrentLocation);
-    
-    const destinationBtn = document.getElementById('destination-btn');
-    const pickupBtn = document.getElementById('pickup-btn');
-    
-    if (destinationBtn) destinationBtn.addEventListener('click', selectDestination);
-    if (pickupBtn) pickupBtn.addEventListener('click', selectOnMap);
-
     // Add passive event listeners for better mobile performance
     document.addEventListener('touchstart', function() {}, {passive: true});
     document.addEventListener('touchmove', function() {}, {passive: true});
-
-    // Add pulse animation to buttons
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(button => {
-        button.addEventListener('mouseenter', () => {
-            button.style.animation = 'pulse 0.5s ease';
-        });
-        
-        button.addEventListener('animationend', () => {
-            button.style.animation = '';
-        });
-    });
 
     // Initial animation check on load and add scroll event listener
     animateOnScroll();
@@ -274,27 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', throttle(() => {
         isMobile = window.innerWidth <= 768;
     }, 100));
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target === bookingModal) {
-            closeModal();
-        }
-    });
-    
-    // Add input focus handlers
-    if (pickupInput) {
-        pickupInput.addEventListener('focus', () => {
-            window.selectedMode = 'pickup';
-        });
-    }
-    
-    if (destinationInput) {
-        destinationInput.addEventListener('focus', () => {
-            window.selectedMode = 'destination';
-        });
-    }
-});
+}
 
 // Function to place a marker on the map
 function placeMarker(location, type = window.selectedMode) {
@@ -477,93 +690,677 @@ function calculateAndDisplayRoute() {
     }
 }
 
-// Functions
+// Booking Functions
 function handleBooking(e) {
     e.preventDefault();
     
-    const pickupInput = document.getElementById('pickup');
-    const nameInput = document.getElementById('name');
-    const phoneInput = document.getElementById('phone');
-    const carTypeSelect = document.getElementById('car-type');
+    const el = window.elements;
     
     // Validate form
-    if (!pickupInput.value || !nameInput.value || !phoneInput.value || !carTypeSelect.value) {
+    if (!el.pickupInput.value || !el.nameInput.value || !el.phoneInput.value || !el.carTypeSelect.value) {
         alert('Please fill in all required fields');
         return;
     }
     
+    // Additional validation for scheduled rides
+    if (window.isScheduled) {
+        if (!el.rideDateInput.value || !el.rideTimeInput.value) {
+            alert('Please select both date and time for your scheduled ride');
+            return;
+        }
+        
+        // Validate that the scheduled time is in the future
+        const now = new Date();
+        const scheduledDateTime = new Date(
+            `${el.rideDateInput.value}T${el.rideTimeInput.value}`
+        );
+        
+        if (scheduledDateTime <= now) {
+            alert('Please select a future date and time for your scheduled ride');
+            return;
+        }
+    }
+    
     // Submit booking
-    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const submitBtn = el.rideSubmitBtn;
     submitBtn.innerHTML = '<span class="btn-loading"></span>Processing';
     submitBtn.disabled = true;
     
     // In a real application, this would send the data to a server
-    // and process the response
+    
+    // Store the booking in localStorage if user is logged in
+    if (window.isLoggedIn) {
+        saveBooking();
+    }
     
     // Display booking confirmation
-    showBookingConfirmation();
+    setTimeout(() => {
+        showBookingConfirmation();
+        
+        // Reset form and button state
+        el.rideForm.reset();
+        submitBtn.innerHTML = 'Request Ride';
+        submitBtn.disabled = false;
+        
+        // Clear markers
+        window.markers.forEach(marker => marker.setMap(null));
+        window.markers = [];
+        
+        // Clear directions
+        if (window.directionsRenderer) {
+            window.directionsRenderer.setDirections({routes: []});
+        }
+    }, 1500); // Simulate server processing time
+}
+
+function saveBooking() {
+    const el = window.elements;
     
-    // Reset form and button state
-    e.target.reset();
-    submitBtn.innerHTML = 'Request Ride';
-    submitBtn.disabled = false;
+    // Create a booking object
+    const booking = {
+        id: `booking-${Date.now()}`,
+        pickup: el.pickupInput.value,
+        destination: el.destinationInput.value || 'Not specified',
+        name: el.nameInput.value,
+        phone: el.phoneInput.value,
+        carType: el.carTypeSelect.value,
+        notes: el.notesInput.value || '',
+        scheduled: window.isScheduled,
+        timestamp: Date.now()
+    };
     
-    // Clear markers
-    window.markers.forEach(marker => marker.setMap(null));
-    window.markers = [];
-    
-    // Clear directions
-    if (window.directionsRenderer) {
-        window.directionsRenderer.setDirections({routes: []});
+    // Add scheduled ride details if applicable
+    if (window.isScheduled) {
+        booking.date = el.rideDateInput.value;
+        booking.time = el.rideTimeInput.value;
+        booking.scheduledTimestamp = new Date(`${booking.date}T${booking.time}`).getTime();
     }
+    
+    // Get existing bookings from localStorage
+    let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+    
+    // Add the new booking
+    bookings.push(booking);
+    
+    // Save to localStorage
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+    
+    // Update UI if account dashboard is open
+    updateDashboard();
 }
 
 function showBookingConfirmation() {
-    const bookingModal = document.getElementById('booking-modal');
-    const bookingDetails = document.getElementById('booking-details');
+    const el = window.elements;
+    
+    if (!el.bookingModal || !el.bookingDetails) return;
+    
+    // Format booking details
+    let detailsHTML = '';
+    
+    if (window.isScheduled) {
+        const date = new Date(`${el.rideDateInput.value}T${el.rideTimeInput.value}`);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        const formattedTime = date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        detailsHTML = `
+            <div class="booking-confirmation">
+                <p><strong>Your ride has been scheduled for:</strong></p>
+                <p class="scheduled-time">${formattedDate} at ${formattedTime}</p>
+                <div class="booking-route">
+                    <div class="route-point">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>${el.pickupInput.value}</span>
+                    </div>
+                    <div class="route-line"></div>
+                    <div class="route-point">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span>${el.destinationInput.value || 'Not specified'}</span>
+                    </div>
+                </div>
+                <p class="confirmation-message">We'll notify you 15 minutes before pickup time.</p>
+            </div>
+        `;
+    } else {
+        detailsHTML = `
+            <div class="booking-confirmation">
+                <p><strong>A driver will be assigned to you shortly.</strong></p>
+                <div class="booking-route">
+                    <div class="route-point">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>${el.pickupInput.value}</span>
+                    </div>
+                    <div class="route-line"></div>
+                    <div class="route-point">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span>${el.destinationInput.value || 'Not specified'}</span>
+                    </div>
+                </div>
+                <p class="confirmation-message">You will receive a notification when your driver arrives.</p>
+            </div>
+        `;
+    }
+    
+    // Update the modal content
+    el.bookingDetails.innerHTML = detailsHTML;
     
     // Show modal with animation
-    bookingModal.style.display = 'flex';
-    bookingModal.style.opacity = '0';
+    openModal(el.bookingModal);
+}
+
+// Account Management Functions
+function handleLogin(e) {
+    e.preventDefault();
     
-    // Display booking details
-    bookingDetails.innerHTML = `
-        <p><strong>Your booking has been confirmed!</strong></p>
-        <p>A driver will be assigned to you shortly and will contact you at the provided number.</p>
-    `;
+    const el = window.elements;
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    // In a real app, we would validate credentials against a server
+    // For demo purposes, we'll accept any input and simulate a login
+    
+    // Simulate login process
+    const loginBtn = e.target.querySelector('button[type="submit"]');
+    loginBtn.innerHTML = '<span class="btn-loading"></span>Logging in...';
+    loginBtn.disabled = true;
     
     setTimeout(() => {
-        bookingModal.style.opacity = '1';
-        bookingModal.style.transition = 'opacity 0.3s ease';
+        // Create user data
+        window.userData = {
+            name: 'John Doe', // Demo name
+            email: email,
+            phone: '+592 123-4567', // Demo phone
+            totalRides: 12,
+            upcomingRides: 2
+        };
         
-        const modalContent = document.querySelector('.modal-content');
-        modalContent.style.transform = 'scale(0.8)';
+        // Save to localStorage
+        localStorage.setItem('userData', JSON.stringify(window.userData));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Update login state
+        window.isLoggedIn = true;
+        
+        // Update UI
+        updateUIForLoggedInUser();
+        
+        // Close login modal
+        closeModal(el.loginModal);
+        
+        // Reset form and button
+        el.loginForm.reset();
+        loginBtn.innerHTML = 'Login';
+        loginBtn.disabled = false;
+        
+        // Show success message
+        showNotification('Welcome back! You are now logged in.', 'success');
+    }, 1500); // Simulate server processing
+}
+
+function handleSignup(e) {
+    e.preventDefault();
+    
+    const el = window.elements;
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const phone = document.getElementById('signup-phone').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm-password').value;
+    
+    // Simple validation
+    if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+    }
+    
+    // In a real app, we would send this data to a server
+    // For demo purposes, we'll accept any input and simulate account creation
+    
+    // Simulate signup process
+    const signupBtn = e.target.querySelector('button[type="submit"]');
+    signupBtn.innerHTML = '<span class="btn-loading"></span>Creating account...';
+    signupBtn.disabled = true;
+    
+    setTimeout(() => {
+        // Create user data
+        window.userData = {
+            name: name,
+            email: email,
+            phone: phone,
+            totalRides: 0,
+            upcomingRides: 0
+        };
+        
+        // Save to localStorage
+        localStorage.setItem('userData', JSON.stringify(window.userData));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Update login state
+        window.isLoggedIn = true;
+        
+        // Update UI
+        updateUIForLoggedInUser();
+        
+        // Close signup modal
+        closeModal(el.signupModal);
+        
+        // Reset form and button
+        el.signupForm.reset();
+        signupBtn.innerHTML = 'Create Account';
+        signupBtn.disabled = false;
+        
+        // Show success message
+        showNotification('Account created successfully! Welcome to Salaam Rides.', 'success');
+    }, 1500); // Simulate server processing
+}
+
+function handleLogout() {
+    // Clear user data and localStorage
+    window.userData = null;
+    window.isLoggedIn = false;
+    
+    localStorage.removeItem('userData');
+    localStorage.setItem('isLoggedIn', 'false');
+    
+    // Update UI
+    updateUIForLoggedOutUser();
+    
+    // Close account modal
+    closeModal(window.elements.accountModal);
+    
+    // Show notification
+    showNotification('You have been logged out.', 'info');
+}
+
+function handleAccountClick(e) {
+    e.preventDefault();
+    
+    // If user is logged in, show the account dashboard
+    // If not, show the login modal
+    if (window.isLoggedIn) {
+        updateDashboard();
+        openModal(window.elements.accountModal);
+    } else {
+        openModal(window.elements.loginModal);
+    }
+}
+
+function handleProfileUpdate(e) {
+    e.preventDefault();
+    
+    const el = window.elements;
+    const name = document.getElementById('edit-name').value;
+    const email = document.getElementById('edit-email').value;
+    const phone = document.getElementById('edit-phone').value;
+    
+    // Update user data
+    window.userData.name = name;
+    window.userData.email = email;
+    window.userData.phone = phone;
+    
+    // Save to localStorage
+    localStorage.setItem('userData', JSON.stringify(window.userData));
+    
+    // Update UI
+    updateProfileDisplay();
+    
+    // Hide edit form
+    toggleEditProfile();
+    
+    // Show success message
+    showNotification('Profile updated successfully!', 'success');
+}
+
+function updateProfileDisplay() {
+    const el = window.elements;
+    
+    if (window.userData) {
+        // Update profile info in the dashboard
+        el.profileName.textContent = window.userData.name;
+        el.profileEmail.textContent = window.userData.email;
+        el.profilePhone.textContent = window.userData.phone;
+        
+        // Update edit form values
+        document.getElementById('edit-name').value = window.userData.name;
+        document.getElementById('edit-email').value = window.userData.email;
+        document.getElementById('edit-phone').value = window.userData.phone;
+        
+        // Update ride statistics
+        document.getElementById('total-rides').textContent = window.userData.totalRides;
+        document.getElementById('upcoming-rides').textContent = window.userData.upcomingRides;
+    }
+}
+
+// Dashboard Management
+function updateDashboard() {
+    if (!window.isLoggedIn) return;
+    
+    // Update profile display
+    updateProfileDisplay();
+    
+    // Update ride history
+    updateRideHistory();
+    
+    // Update scheduled rides
+    updateScheduledRides();
+}
+
+function updateRideHistory() {
+    // In a real app, we would fetch this data from a server
+    // For demo purposes, we'll just use the demo data
+    // This would be replaced with actual data in a production app
+}
+
+function updateScheduledRides() {
+    // In a real app, we would fetch this data from a server
+    // For demo purposes, we'll just use demo data
+    // This would be replaced with actual data in a production app
+    
+    // Check if there are any scheduled rides and update empty state
+    checkEmptyRides();
+}
+
+// Utility Functions
+function openModal(modal) {
+    if (!modal) return;
+    
+    modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.style.transform = 'scale(0.9)';
         modalContent.style.opacity = '0';
+    }
+    
+    // Fade in modal
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modal.style.transition = 'opacity 0.3s ease';
         
-        setTimeout(() => {
+        if (modalContent) {
             modalContent.style.transform = 'scale(1)';
             modalContent.style.opacity = '1';
             modalContent.style.transition = 'all 0.3s ease';
-        }, 100);
-    }, 50);
+        }
+    }, 10);
+    
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-    const bookingModal = document.getElementById('booking-modal');
-    const modalContent = document.querySelector('.modal-content');
+function closeModal(modal) {
+    if (!modal) return;
     
-    modalContent.style.transform = 'scale(1.1)';
-    modalContent.style.opacity = '0';
-    modalContent.style.transition = 'all 0.3s ease';
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.style.transform = 'scale(1.1)';
+        modalContent.style.opacity = '0';
+        modalContent.style.transition = 'all 0.3s ease';
+    }
     
+    // Fade out modal
+    modal.style.opacity = '0';
+    modal.style.transition = 'opacity 0.3s ease';
+    
+    // Hide modal after animation
     setTimeout(() => {
-        bookingModal.style.opacity = '0';
-        bookingModal.style.transition = 'opacity 0.3s ease';
+        modal.style.display = 'none';
+        
+        // Reset tab display for dashboard
+        if (modal.id === 'account-modal') {
+            switchDashboardTab('profile');
+        }
+    }, 300);
+    
+    // Unlock body scroll
+    document.body.style.overflow = '';
+}
+
+function switchBookingTab(tab) {
+    const el = window.elements;
+    
+    // Update tab buttons
+    el.bookingTabs.forEach(tabEl => {
+        if (tabEl.dataset.tab === tab) {
+            tabEl.classList.add('active');
+        } else {
+            tabEl.classList.remove('active');
+        }
+    });
+    
+    // Show/hide schedule options
+    if (tab === 'schedule') {
+        window.isScheduled = true;
+        el.scheduleOptions.style.display = 'block';
+        el.rideSubmitBtn.innerText = 'Schedule Ride';
+        
+        // Show animation
+        el.scheduleOptions.style.opacity = '0';
+        el.scheduleOptions.style.transform = 'translateY(-10px)';
         
         setTimeout(() => {
-            bookingModal.style.display = 'none';
+            el.scheduleOptions.style.opacity = '1';
+            el.scheduleOptions.style.transform = 'translateY(0)';
+            el.scheduleOptions.style.transition = 'all 0.3s ease';
+        }, 10);
+    } else {
+        window.isScheduled = false;
+        
+        // Fade out animation
+        el.scheduleOptions.style.opacity = '0';
+        el.scheduleOptions.style.transform = 'translateY(-10px)';
+        el.scheduleOptions.style.transition = 'all 0.3s ease';
+        
+        setTimeout(() => {
+            el.scheduleOptions.style.display = 'none';
+            el.rideSubmitBtn.innerText = 'Request Ride';
         }, 300);
-    }, 200);
+    }
+}
+
+function switchDashboardTab(tab) {
+    const el = window.elements;
+    
+    // Update tab buttons
+    el.dashboardTabs.forEach(tabEl => {
+        if (tabEl.dataset.tab === tab) {
+            tabEl.classList.add('active');
+        } else {
+            tabEl.classList.remove('active');
+        }
+    });
+    
+    // Show corresponding panel
+    el.dashboardPanels.forEach(panel => {
+        if (panel.id === `${tab}-panel`) {
+            panel.classList.add('active');
+        } else {
+            panel.classList.remove('active');
+        }
+    });
+}
+
+function checkEmptyRides() {
+    const el = window.elements;
+    
+    // Past rides empty state
+    const pastRides = el.pastRidesList.querySelectorAll('.ride-item');
+    const pastRidesEmpty = el.pastRidesList.querySelector('.empty-state');
+    
+    if (pastRides.length === 0 && pastRidesEmpty) {
+        pastRidesEmpty.style.display = 'flex';
+    } else if (pastRidesEmpty) {
+        pastRidesEmpty.style.display = 'none';
+    }
+    
+    // Scheduled rides empty state
+    const scheduledRides = el.scheduledRidesList.querySelectorAll('.ride-item');
+    const scheduledRidesEmpty = el.scheduledRidesList.querySelector('.empty-state');
+    
+    if (scheduledRides.length === 0 && scheduledRidesEmpty) {
+        scheduledRidesEmpty.style.display = 'flex';
+    } else if (scheduledRidesEmpty) {
+        scheduledRidesEmpty.style.display = 'none';
+    }
+}
+
+function toggleEditProfile() {
+    const el = window.elements;
+    const profileInfo = el.profilePanel.querySelector('.profile-info');
+    const profileStats = el.profilePanel.querySelector('.profile-stats');
+    
+    if (el.editProfileForm.style.display === 'none') {
+        // Show edit form
+        profileInfo.style.display = 'none';
+        profileStats.style.display = 'none';
+        el.editProfileForm.style.display = 'block';
+    } else {
+        // Hide edit form
+        el.editProfileForm.style.display = 'none';
+        profileInfo.style.display = 'flex';
+        profileStats.style.display = 'flex';
+    }
+}
+
+function checkLoginState() {
+    // Check if user is logged in from localStorage
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const userData = localStorage.getItem('userData');
+    
+    if (isLoggedIn && userData) {
+        window.isLoggedIn = true;
+        window.userData = JSON.parse(userData);
+        
+        // Update UI for logged in user
+        updateUIForLoggedInUser();
+    } else {
+        window.isLoggedIn = false;
+        window.userData = null;
+        
+        // Update UI for logged out user
+        updateUIForLoggedOutUser();
+    }
+}
+
+function updateUIForLoggedInUser() {
+    const el = window.elements;
+    
+    // Hide login/signup buttons
+    el.accountButtons.style.display = 'none';
+    
+    // Show account link
+    el.accountLink.style.display = 'block';
+    el.accountLink.textContent = `Hi, ${window.userData.name.split(' ')[0]}`;
+    
+    // Update name field in booking form if empty
+    if (el.nameInput.value === '') {
+        el.nameInput.value = window.userData.name;
+    }
+    
+    // Update phone field in booking form if empty
+    if (el.phoneInput.value === '') {
+        el.phoneInput.value = window.userData.phone;
+    }
+}
+
+function updateUIForLoggedOutUser() {
+    const el = window.elements;
+    
+    // Show login/signup buttons
+    el.accountButtons.style.display = 'flex';
+    
+    // Update account link
+    el.accountLink.style.display = 'block';
+    el.accountLink.textContent = 'My Account';
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${type === 'success' 
+                  ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>'
+                  : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>'}
+            </svg>
+        </div>
+        <div class="notification-message">${message}</div>
+    `;
+    
+    // Add to the document body
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(110%)';
+        notification.style.opacity = '0';
+        
+        // Remove from DOM after animation
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 4000);
+}
+
+// Function to handle the destination map button click
+function selectDestination() {
+    window.selectedMode = 'destination';
+    // Focus the input field and change the map mode
+    const destinationInput = document.getElementById('destination');
+    if (destinationInput) {
+        destinationInput.focus();
+    }
+    
+    // Set a visual indicator that we're in destination selection mode (optional)
+    if (window.map) {
+        window.map.setOptions({
+            draggableCursor: 'crosshair'
+        });
+    }
+}
+
+// Function to handle the pickup map button click
+function selectOnMap() {
+    window.selectedMode = 'pickup';
+    // Focus the input field and change the map mode
+    const pickupInput = document.getElementById('pickup');
+    if (pickupInput) {
+        pickupInput.focus();
+    }
+    
+    // Set a visual indicator that we're in pickup selection mode (optional)
+    if (window.map) {
+        window.map.setOptions({
+            draggableCursor: 'crosshair'
+        });
+    }
 }
 
 function getCurrentLocation() {
@@ -652,38 +1449,4 @@ function getCurrentLocation() {
             maximumAge: 0
         }
     );
-}
-
-// Function to handle the destination map button click
-function selectDestination() {
-    window.selectedMode = 'destination';
-    // Focus the input field and change the map mode
-    const destinationInput = document.getElementById('destination');
-    if (destinationInput) {
-        destinationInput.focus();
-    }
-    
-    // Set a visual indicator that we're in destination selection mode (optional)
-    if (window.map) {
-        window.map.setOptions({
-            draggableCursor: 'crosshair'
-        });
-    }
-}
-
-// Function to handle the pickup map button click
-function selectOnMap() {
-    window.selectedMode = 'pickup';
-    // Focus the input field and change the map mode
-    const pickupInput = document.getElementById('pickup');
-    if (pickupInput) {
-        pickupInput.focus();
-    }
-    
-    // Set a visual indicator that we're in pickup selection mode (optional)
-    if (window.map) {
-        window.map.setOptions({
-            draggableCursor: 'crosshair'
-        });
-    }
 }
