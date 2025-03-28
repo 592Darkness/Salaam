@@ -1804,3 +1804,40 @@ gmp-advanced-marker {
         display: flex !important;
     }
 }
+/* Device-specific controls - Add this at the end of styles.css file */
+
+/* Base styles to ensure everything is visible by default */
+#map, .map-container, .map-controls {
+    display: block;
+}
+
+.map-controls {
+    display: flex;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+/* Desktop styles - only hide the location button */
+@media (min-width: 769px) {
+    #current-location {
+        display: none !important;
+    }
+}
+
+/* Mobile styles - ensure everything is visible */
+@media (max-width: 768px) {
+    #current-location {
+        display: flex !important;
+    }
+    
+    .map-controls {
+        display: flex !important;
+    }
+    
+    #map, .map-container {
+        display: block !important;
+    }
+}
