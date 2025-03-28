@@ -628,11 +628,50 @@
                 // Setup new autocomplete or fallback to legacy
                 setupPlaceAutocomplete();
                 
+                // Force map visibility
+                fixMobileMapVisibility();
+                
                 console.log('Map initialization completed successfully');
             } catch (error) {
                 console.error('Error initializing map:', error);
                 showMapError('An error occurred while initializing the map. Please refresh the page.');
             }
+        }
+        
+        // Function to force map visibility on mobile - ADDED FOR MOBILE FIX
+        function fixMobileMapVisibility() {
+            const mapContainer = document.querySelector('.map-container');
+            const map = document.getElementById('map');
+            const mapControls = document.querySelector('.map-controls');
+            
+            if (!mapContainer || !map) {
+                console.error('Map elements not found when trying to fix visibility');
+                return;
+            }
+            
+            // Force visibility through direct style manipulation
+            mapContainer.style.display = 'block';
+            mapContainer.style.visibility = 'visible';
+            mapContainer.style.height = window.innerWidth <= 768 ? '300px' : '400px';
+            mapContainer.style.position = 'relative';
+            mapContainer.style.zIndex = '1';
+            
+            map.style.display = 'block';
+            map.style.visibility = 'visible';
+            map.style.position = 'absolute';
+            map.style.top = '0';
+            map.style.left = '0';
+            map.style.width = '100%';
+            map.style.height = '100%';
+            map.style.zIndex = '2';
+            
+            if (mapControls) {
+                mapControls.style.display = 'flex';
+                mapControls.style.position = 'absolute';
+                mapControls.style.zIndex = '5';
+            }
+            
+            console.log('Mobile map visibility fix applied');
         }
         
         // Setup autocomplete using new PlaceAutocompleteElement if available or fallback to legacy
@@ -879,6 +918,33 @@
             }
         }
         
+        // Function to check if device is mobile
+        function isMobileDevice() {
+            // Check if the device is mobile based on screen size or user agent
+            const isMobileBySize = window.innerWidth <= 768;
+            const isMobileByAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            return isMobileBySize || isMobileByAgent;
+        }
+        
+        // Function to set up device-specific elements
+        function setupDeviceSpecificElements() {
+            const currentLocationBtn = document.getElementById('current-location');
+            const desktopMessage = document.querySelector('.desktop-location-message');
+            
+            if (!currentLocationBtn) return;
+            
+            if (isMobileDevice()) {
+                // Show the button on mobile devices
+                currentLocationBtn.style.display = 'flex';
+                if (desktopMessage) desktopMessage.style.display = 'none';
+            } else {
+                // Hide the button on desktop/PC
+                currentLocationBtn.style.display = 'none';
+                if (desktopMessage) desktopMessage.style.display = 'block';
+            }
+        }
+        
         // Improved getCurrentLocation function
         function getCurrentLocation() {
             const currentLocationBtn = document.getElementById('current-location');
@@ -1090,6 +1156,18 @@
                 currentLocationBtn.addEventListener('click', getCurrentLocation);
             }
             
+            // Set up device-specific elements
+            setupDeviceSpecificElements();
+            
+            // Force map visibility after a delay
+            setTimeout(fixMobileMapVisibility, 1000);
+            
+            // Setup resize handler
+            window.addEventListener('resize', function() {
+                setupDeviceSpecificElements();
+                fixMobileMapVisibility();
+            });
+            
             // Add map notification styles
             const style = document.createElement('style');
             style.textContent = `
@@ -1159,8 +1237,89 @@
                         left: auto;
                     }
                 }
+                
+                /* Critical fix for mobile map visibility */
+                @media (max-width: 768px) {
+                    .map-container {
+                        display: block !important;
+                        visibility: visible !important;
+                        height: 300px !important;
+                        position: relative !important;
+                        z-index: 1 !important;
+                    }
+                    
+                    #map {
+                        display: block !important;
+                        visibility: visible !important;
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        z-index: 2 !important;
+                    }
+                    
+                    .map-controls {
+                        display: flex !important;
+                        position: absolute !important;
+                        bottom: 20px !important;
+                        left: 50% !important;
+                        transform: translateX(-50%) !important;
+                        z-index: 5 !important;
+                    }
+                    
+                    #current-location {
+                        display: flex !important;
+                    }
+                    
+                    .desktop-location-message {
+                        display: none !important;
+                    }
+                }
             `;
             document.head.appendChild(style);
+        });
+    </script>
+    
+    <!-- Mobile Map Debug Script -->
+    <script>
+        // Debug code to help track mobile map issues
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set timeout to check map visibility after everything loads
+            setTimeout(function() {
+                // Check map elements
+                const mapContainer = document.querySelector('.map-container');
+                const map = document.getElementById('map');
+                const mapFallback = document.getElementById('map-fallback');
+                const currentLocationBtn = document.getElementById('current-location');
+                
+                // Log for debugging
+                console.log("=== MAP DEBUG INFO ===");
+                console.log('Mobile device?', window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+                console.log('Map container exists?', !!mapContainer);
+                console.log('Map element exists?', !!map);
+                
+                // Detailed element checks
+                if (mapContainer) {
+                    const styles = window.getComputedStyle(mapContainer);
+                    console.log('Map container dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+                    console.log('Map container display:', styles.display);
+                    console.log('Map container visibility:', styles.visibility);
+                }
+                
+                if (map) {
+                    const styles = window.getComputedStyle(map);
+                    console.log('Map dimensions:', map.offsetWidth, 'x', map.offsetHeight);
+                    console.log('Map display:', styles.display);
+                    console.log('Map visibility:', styles.visibility);
+                }
+                
+                if (currentLocationBtn) {
+                    console.log('Current location button display:', window.getComputedStyle(currentLocationBtn).display);
+                }
+                
+                console.log("=====================");
+            }, 2000);
         });
     </script>
 </body>
