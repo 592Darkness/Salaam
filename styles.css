@@ -2003,3 +2003,77 @@ gmp-advanced-marker {
         border-radius: 0 !important;
     }
 }
+/* Add this to your styles.css file */
+
+/* Styling for the location input group with current location button */
+.location-input-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.location-input {
+    position: relative;
+    flex-grow: 1;
+}
+
+.current-location-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    height: 40px; /* Match the height of the input field */
+}
+
+.current-location-btn svg {
+    margin-right: 5px;
+}
+
+/* Hide map on mobile */
+@media (max-width: 768px) {
+    .map-container {
+        display: none !important;
+    }
+    
+    /* Make booking form take full width */
+    .booking-form {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Adjust the location button for mobile */
+    .location-input-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .current-location-btn {
+        width: 100%;
+    }
+    
+    /* Adjust spacing for booking container on mobile */
+    .booking-container {
+        gap: 0 !important;
+    }
+}
+
+/* Desktop message no longer needed */
+.desktop-location-message {
+    display: none !important;
+}
+
+/* Ensure map is visible only on desktop */
+@media (min-width: 769px) {
+    .map-container {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    #map {
+        display: block !important;
+        visibility: visible !important;
+    }
+}
