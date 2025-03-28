@@ -325,10 +325,10 @@
         </div>
     </div>
 
-    <!-- Signup Modal -->
+    <!-- Signup Modal - REVAMPED -->
     <div class="modal" id="signup-modal">
         <div class="modal-content">
-            <button class="modal-close">×</button>
+            <button class="modal-close" aria-label="Close signup modal">×</button>
             <div class="modal-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -338,53 +338,77 @@
                 </svg>
             </div>
             <h3 class="modal-title">Create Your Account</h3>
-            <form id="signup-form">
+            <form id="signup-form" novalidate>
                 <div class="form-group">
                     <label for="signup-name">Full Name</label>
-                    <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                    <input type="text" id="signup-name" placeholder="Enter your full name" required 
+                           aria-describedby="name-error" autocomplete="name">
+                    <div id="name-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                    <input type="email" id="signup-email" placeholder="Enter your email" required 
+                           aria-describedby="email-error" autocomplete="email">
+                    <div id="email-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="signup-phone">Phone Number</label>
-                    <input type="tel" id="signup-phone" placeholder="Enter your phone number" required>
+                    <input type="tel" id="signup-phone" placeholder="Enter your phone number" required 
+                           aria-describedby="phone-error" autocomplete="tel">
+                    <div id="phone-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="signup-password">Password</label>
                     <div class="password-input">
-                        <input type="password" id="signup-password" placeholder="Create a password" required>
-                        <button type="button" class="toggle-password">
+                        <input type="password" id="signup-password" placeholder="Create a password" required 
+                               aria-describedby="password-error" autocomplete="new-password"
+                               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$">
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
                         </button>
+                    </div>
+                    <div id="password-error" class="error-message"></div>
+                    <div class="password-requirements">
+                        <p>Password must contain:</p>
+                        <ul>
+                            <li id="req-length"><span class="check"></span> At least 8 characters</li>
+                            <li id="req-uppercase"><span class="check"></span> One uppercase letter</li>
+                            <li id="req-lowercase"><span class="check"></span> One lowercase letter</li>
+                            <li id="req-number"><span class="check"></span> One number</li>
+                        </ul>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="signup-confirm-password">Confirm Password</label>
                     <div class="password-input">
-                        <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required>
-                        <button type="button" class="toggle-password">
+                        <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required 
+                               aria-describedby="confirm-password-error" autocomplete="new-password">
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
                         </button>
                     </div>
+                    <div id="confirm-password-error" class="error-message"></div>
                 </div>
                 <div class="form-options">
                     <label class="checkbox-container">
-                        <input type="checkbox" id="terms-agree" required>
+                        <input type="checkbox" id="terms-agree" required aria-describedby="terms-error">
                         <span class="checkmark"></span>
-                        I agree to the <a href="#">Terms and Conditions</a>
+                        I agree to the <a href="#" tabindex="0">Terms and Conditions</a>
                     </label>
+                    <div id="terms-error" class="error-message"></div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 8px; margin-top: 5px; font-size: 1rem;">Create Account</button>
+                <div class="form-feedback" aria-live="polite"></div>
+                <button type="submit" class="btn btn-primary signup-btn" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 1rem;">
+                    Create Account
+                </button>
                 <div class="form-footer">
-                    <p>Already have an account? <a href="#" id="switch-to-login">Login</a></p>
+                    <p>Already have an account? <a href="#" id="switch-to-login" tabindex="0">Login</a></p>
                 </div>
             </form>
         </div>
