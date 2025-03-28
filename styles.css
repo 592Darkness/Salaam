@@ -959,3 +959,627 @@ gmp-advanced-marker {
         max-width: 90%;
     }
 }
+/* Add these styles to the end of your existing styles.css file */
+
+/* Account Buttons in Navigation */
+.account-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--accent-color);
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background-color: rgba(0, 184, 148, 0.1);
+    border-color: var(--accent-color);
+    transform: translateY(-3px);
+}
+
+.btn-sm {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* Modal Improvements */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--muted-text);
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    color: var(--text-color);
+}
+
+.dashboard-content {
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-bottom: 30px;
+}
+
+/* Booking Tabs */
+.booking-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.booking-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.booking-tab.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.booking-tab:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+/* Schedule Options Styling */
+.schedule-options {
+    border-top: 1px solid var(--input-border);
+    border-bottom: 1px solid var(--input-border);
+    padding: 15px 0;
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Account Forms Styling */
+.password-input {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    padding: 0;
+}
+
+.toggle-password:hover {
+    color: var(--text-color);
+}
+
+.form-options {
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.form-footer {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--muted-text);
+}
+
+.form-footer a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.forgot-password {
+    color: var(--muted-text);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: var(--accent-color);
+}
+
+/* Dashboard Tabs */
+.dashboard-tabs {
+    display: flex;
+    margin: 20px 0;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.dashboard-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-tab.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.dashboard-tab:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+.dashboard-panel {
+    display: none;
+}
+
+.dashboard-panel.active {
+    display: block;
+}
+
+/* Profile Panel Styling */
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background-color: var(--input-bg);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--accent-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-details {
+    flex: 1;
+}
+
+.profile-details h4 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.profile-details p {
+    color: var(--muted-text);
+    margin-bottom: 5px;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    flex: 1;
+    background-color: var(--card-bg);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: var(--muted-text);
+    font-size: 0.9rem;
+}
+
+.edit-profile-btn {
+    white-space: nowrap;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.logout-btn {
+    margin-top: 20px;
+}
+
+/* Rides List Styling */
+.rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ride-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-bg);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ride-item.scheduled {
+    border-left: 3px solid var(--accent-color);
+}
+
+.ride-date {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.ride-route {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ride-point {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.point-marker {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.point-marker.pickup {
+    background-color: var(--accent-color);
+}
+
+.point-marker.destination {
+    background-color: var(--danger-color);
+}
+
+.point-address {
+    font-size: 0.9rem;
+    color: var(--muted-text);
+}
+
+.ride-details, .ride-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.ride-price {
+    font-weight: 600;
+}
+
+.ride-status {
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.ride-status.completed {
+    background-color: rgba(0, 184, 148, 0.2);
+    color: var(--accent-color);
+}
+
+.ride-status.canceled {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: var(--danger-color);
+}
+
+.ride-status.pending {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted-text);
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    border: 1px dashed var(--input-border);
+}
+
+.empty-state svg {
+    margin-bottom: 15px;
+    color: var(--muted-text);
+}
+
+.empty-state p {
+    margin-bottom: 20px;
+}
+
+/* Booking Confirmation Styling */
+.booking-confirmation {
+    padding: 15px 0;
+}
+
+.scheduled-time {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.booking-route {
+    background-color: var(--input-bg);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.route-point {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.route-point:first-child {
+    border-bottom: 1px dashed var(--input-border);
+    padding-bottom: 15px;
+}
+
+.route-point:last-child {
+    padding-top: 15px;
+}
+
+.route-line {
+    width: 2px;
+    height: 20px;
+    background-color: var(--input-border);
+    margin-left: 8px;
+}
+
+.confirmation-message {
+    font-size: 0.9rem;
+    color: var(--muted-text);
+    margin-top: 15px;
+}
+
+/* Notification System */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateX(110%);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 1000;
+    max-width: 350px;
+    border-left: 3px solid var(--accent-color);
+}
+
+.notification.success {
+    border-left-color: var(--accent-color);
+}
+
+.notification.error {
+    border-left-color: var(--danger-color);
+}
+
+.notification.info {
+    border-left-color: #3498db;
+}
+
+.notification-icon {
+    color: var(--accent-color);
+}
+
+.notification.success .notification-icon {
+    color: var(--accent-color);
+}
+
+.notification.error .notification-icon {
+    color: var(--danger-color);
+}
+
+.notification.info .notification-icon {
+    color: #3498db;
+}
+
+.notification-message {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    /* Account buttons for mobile */
+    .account-buttons {
+        display: none;
+    }
+    
+    /* Move account link to mobile menu */
+    #account-link {
+        display: block !important;
+    }
+    
+    /* Schedule options for mobile */
+    .schedule-options {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Profile info for mobile */
+    .profile-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-details {
+        margin-bottom: 15px;
+    }
+    
+    /* Ride item for mobile */
+    .ride-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .ride-details, .ride-actions {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+    }
+    
+    /* Notification for mobile */
+    .notification {
+        left: 10px;
+        right: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    /* Dashboard modal for mobile */
+    .dashboard-content {
+        padding: 30px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Stats for small mobile */
+    .profile-stats {
+        flex-direction: column;
+    }
+    
+    .stat-item {
+        padding: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    /* Form actions for small mobile */
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+    
+    /* Form options for small mobile */
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    /* Booking tabs for small mobile */
+    .booking-tab, .dashboard-tab {
+        padding: 8px 5px;
+        font-size: 0.9rem;
+    }
+}
